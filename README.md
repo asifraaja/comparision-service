@@ -1,4 +1,5 @@
 add application.yml under src/main/resources
+<code>
 git:
   personal-token: 
 spring:
@@ -16,3 +17,4 @@ cassandra:
   client-id: <cass-client-id>
   client-secret: <cass-client-secret>
   token: <cass-token.
+<code>
