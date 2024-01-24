@@ -1,0 +1,52 @@
+{
+  "groups": [
+    {
+      "group": "Safety",
+      "groupOrder": 4,
+      "specifications": [
+        {
+          "name": "Overspeed Warning",
+          "description": "Triggers a warning when car is overspeeding",
+          "sortOrder": 1
+        },
+        {
+          "name": "Airbags",
+          "description": "Number of airbags in car",
+          "sortOrder": 2
+        }
+      ]
+    },
+    {
+      "group": "Braking",
+      "groupOrder": 5,
+      "specifications": [
+        {
+          "name": "Anti-Lock Braking System",
+          "description": "Triggers a warning when car is overspeeding",
+          "sortOrder": 1
+        },
+        {
+          "name": "Hill Hold Control",
+          "description": "Number of airbags in car",
+          "sortOrder": 2
+        }
+      ]
+    },
+    {
+      "group": "Extra Features",
+      "groupOrder": 6,
+      "specifications": [
+        {
+          "name": "Bluetooth",
+          "description": "Does the car have bluetooth",
+          "sortOrder": 1
+        },
+        {
+          "name": "Internet",
+          "description": "Does the car have internet",
+          "sortOrder": 2
+        }
+      ]
+    }
+  ]
+}

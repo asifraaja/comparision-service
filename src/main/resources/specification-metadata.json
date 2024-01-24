@@ -1,0 +1,57 @@
+{
+  "groups": [
+    {
+      "group": "Engine & Transmission",
+      "groupOrder": 1,
+      "specifications": [
+        {
+          "name": "Engine",
+          "description": "Details about the engine",
+          "sortOrder": 1
+        },
+        {
+          "name": "Acceleration",
+          "description": "Time taken to reach (0-100 kmph)",
+          "sortOrder": 2
+        }
+      ]
+    },
+    {
+      "group": "Dimensions & Width",
+      "groupOrder": 2,
+      "specifications": [
+        {
+          "name": "length",
+          "description": "Length of the car",
+          "sortOrder": 1
+        },
+        {
+          "name": "height",
+          "description": "Height of the car",
+          "sortOrder": 2
+        }
+      ]
+    },
+    {
+      "group": "Capacity",
+      "groupOrder": 3,
+      "specifications": [
+        {
+          "name": "Doors",
+          "description": "Number of doors",
+          "sortOrder": 1
+        },
+        {
+          "name": "Fuel Tank Capacity",
+          "description": "Capacity of the fuel tank",
+          "sortOrder": 2
+        },
+        {
+          "name": "Mileage",
+          "description": "Mileage of the car",
+          "sortOrder": 3
+        }
+      ]
+    }
+    ]
+}
