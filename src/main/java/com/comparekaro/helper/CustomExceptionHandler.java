@@ -54,6 +54,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(createErrorResponse(Collections.singletonList(error)), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnknownException(Exception ex,
+                                                                     WebRequest request){
+        RespError error = new RespError("INTERNAL SERVER ERROR", ex.getMessage());
+        return new ResponseEntity<>(createErrorResponse(Collections.singletonList(error)), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     private ErrorResponse createErrorResponse(List<RespError> errors) {
         return new ErrorResponse(errors);
     }
