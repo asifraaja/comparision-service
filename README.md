@@ -16,5 +16,5 @@ cassandra:
   secure-connect-file: /Users/m0a00pf/Downloads/secure-connect-suggest-cars.zip
   client-id: <cass-client-id>
   client-secret: <cass-client-secret>
-  token: <cass-token.
+  token: <cass-token>
 <code>
