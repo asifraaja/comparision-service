@@ -1,5 +1,6 @@
 package com.comparekaro.helper;
 
+import com.comparekaro.models.Similarity;
 import com.comparekaro.models.domain.FullCarInfo;
 import com.comparekaro.dto.SpecInfo;
 import com.comparekaro.models.Spec;
@@ -12,6 +13,7 @@ import com.comparekaro.models.response.PriceOverview;
 import com.comparekaro.models.response.SpecDetailsResponse;
 import com.comparekaro.models.response.Specification;
 import com.comparekaro.models.response.suggestion.RespError;
+import com.comparekaro.similarity.ISimilarityFinder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -41,11 +43,15 @@ public class ComparisonDetailsResponseCreator {
     @Qualifier("groupOrderMap")
     private Map<String, Integer> groupOrderMap;
 
+    @Autowired
+    private ISimilarityFinder similarityFinder;
+
     public ComparisionDetails generator(Map<String, FullCarInfo> carMap,
                                         List<String> cars,
                                         CompareCarRequest request) {
 
         ComparisionDetails comparisionDetails = ComparisionDetails.builder()
+                .cars(cars)
                 .images(setImages(carMap, cars))
                 .basicCarInfoList(setCarInfos(carMap, cars))
                 .featureList(setFeatures(carMap, cars))
@@ -60,7 +66,25 @@ public class ComparisonDetailsResponseCreator {
 
     private void setSimilarityAndDifference(ComparisionDetails comparisionDetails,
                                             CompareCarRequest request) {
-       List<Specification> specs = new ArrayList<>();
+        List<Specification> specs = getAllSpecifications(comparisionDetails);
+
+        Map<String, Specification> similarSpecs = new HashMap<>();
+        Map<String, Specification> differentSpecs = new HashMap<>();
+        boolean hideSimilarity = request.isHideSimilar();
+        for(Specification spec : specs){
+            Similarity similarity = similarityFinder.findSimilar(spec);
+            if(!hideSimilarity && similarity.equals(Similarity.ALL_SAME))
+                similarSpecs.put(spec.getName(), new Specification(spec));
+            else if(similarity.equals(Similarity.ALL_DIFFERENT) || similarity.equals(Similarity.FEW_SAME))
+                differentSpecs.put(spec.getName(), new Specification(spec));
+        }
+        comparisionDetails.setSimilarity(groupAllSpecs(similarSpecs, featureMap, specMap));
+        comparisionDetails.setDifferences(groupAllSpecs(differentSpecs, featureMap, specMap));
+
+    }
+
+    private static List<Specification> getAllSpecifications(ComparisionDetails comparisionDetails) {
+        List<Specification> specs = new ArrayList<>();
         specs.addAll(
                 comparisionDetails.getSpecificationList().stream()
                .flatMap(sdr -> sdr.getItems().stream())
@@ -69,24 +93,7 @@ public class ComparisonDetailsResponseCreator {
                 comparisionDetails.getFeatureList().stream()
                         .flatMap(sdr -> sdr.getItems().stream())
                         .collect(Collectors.toList()));
-
-        Map<String, Specification> similarSpecs = new HashMap<>();
-        Map<String, Specification> differentSpecs = new HashMap<>();
-        boolean hideSimilarity = request.isHideSimilar();
-        for(Specification spec : specs){
-            List<String> values = spec.getValues();
-            int similartyCount = checkSimilarity(values);
-            if(!hideSimilarity && similartyCount == 1){
-                similarSpecs.put(spec.getName(), new Specification(spec));
-            }else if(similartyCount == 0 ){
-                // do not include this spec
-            }else if(similartyCount == -1){
-                differentSpecs.put(spec.getName(), new Specification(spec));
-            }
-        }
-        comparisionDetails.setSimilarity(groupAllSpecs(similarSpecs, featureMap, specMap));
-        comparisionDetails.setDifferences(groupAllSpecs(differentSpecs, featureMap, specMap));
-
+        return specs;
     }
 
     private List<SpecDetailsResponse> groupAllSpecs(Map<String, Specification> specs,
@@ -123,23 +130,6 @@ public class ComparisonDetailsResponseCreator {
             }
         }
         return groupMap;
-    }
-
-    /*
-    * If all values are empty then return 0
-    * If all values are non-empty & similar then return +1
-    * If any one value is different then return -1
-    * */
-    private int checkSimilarity(List<String> values) {
-        Map<String, Integer> freqMap = new HashMap<>();
-        for(String str : values){
-            if(str == null || str.trim().isEmpty()) continue;
-            freqMap.put(str, freqMap.getOrDefault(str, 0) + 1);
-//            if(freqMap.get(str) > 1) return 1;
-        }
-        if(freqMap.size() == 1) return 1;
-        if (freqMap.isEmpty()) return 0;
-        return -1;
     }
 
     private Metadata setMetadata(Map<String, FullCarInfo> carMap, List<String> cars) {

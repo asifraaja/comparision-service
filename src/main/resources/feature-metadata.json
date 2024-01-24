@@ -13,6 +13,16 @@
           "name": "Airbags",
           "description": "Number of airbags in car",
           "sortOrder": 2
+        },
+        {
+          "name": "Seat Belt Warning",
+          "description": "Does the car beep when seat belt is not put on",
+          "sortOrder": 3
+        },
+        {
+          "name": "Child Safety Lock",
+          "description": "Does the car have Child safety lock button",
+          "sortOrder": 4
         }
       ]
     },

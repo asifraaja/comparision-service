@@ -1,5 +1,6 @@
 package com.comparekaro.service;
 
+import com.comparekaro.errors.CarsNotFoundException;
 import com.comparekaro.mappers.SuggestionDtoToModelMapper;
 import com.comparekaro.models.domain.FullCarInfo;
 import com.comparekaro.dto.SuggestionDto;
@@ -8,9 +9,11 @@ import com.comparekaro.errors.SuggestionNotFoundException;
 import com.comparekaro.models.domain.SuggestionModel;
 import com.comparekaro.repository.CassandraRepository;
 import com.comparekaro.repository.FullCarInfoRepository;
+import com.comparekaro.repository.SuggestionRepository;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CacheService {
     public static final FullCarInfo EMPTY_FULL_CAR_INFO = FullCarInfo.builder().build();
+    public static final SuggestionDto EMPTY_SUGGESTIONS = new SuggestionDto();
     @Autowired private CassandraRepository cassandraRepository;
     @Autowired private FullCarInfoRepository fullCarInfoRepository;
     private LoadingCache<String, SuggestionDto> suggestionsCache;
@@ -32,7 +36,9 @@ public class CacheService {
     public SuggestionDto getSuggestions(String carId){
         try {
             return suggestionsCache.get(carId);
-        } catch (ExecutionException e) {
+        } catch (UncheckedExecutionException e){
+            throw new SuggestionNotFoundException("Car : " + carId + " is not found");
+        }catch (ExecutionException e) {
             log.error("Execution Exception while fetching suggestions : {}",e.getMessage() );
             throw new RuntimeException(e);
         }
@@ -41,10 +47,10 @@ public class CacheService {
     public FullCarInfo getCarInfo(String carId){
         try {
             return carInfoCache.get(carId);
-        } catch (CarNotFoundException cnfe){
-            return EMPTY_FULL_CAR_INFO;
-        }catch (ExecutionException e) {
+        } catch (ExecutionException e) {
             throw new RuntimeException(e);
+        } catch (UncheckedExecutionException e){
+            throw new CarNotFoundException(e.getMessage());
         }
     }
 
@@ -75,19 +81,23 @@ public class CacheService {
                 .build(new CacheLoader<String, SuggestionDto>() {
                     @Override
                     public SuggestionDto load(String key) throws Exception {
-                        return fetchSuggestions(key);
+                        try{
+                            SuggestionDto suggestion = fetchSuggestions(key);
+                            if(suggestion == null || suggestion.getId() == null)
+                                throw new SuggestionNotFoundException("Suggestion not found for " + key);
+                            return suggestion;
+                        }catch (Exception e){
+                            log.error("Exception when fetching car suggestions : {}", e.getMessage());
+                            throw new SuggestionNotFoundException("Suggestion not found for " + key);
+                        }
                     }
                 });
     }
 
     private SuggestionDto fetchSuggestions(String key){
-        try{
-            return cassandraRepository.getSuggestionRepository().findByCarId(key);
-        }catch (Exception npe){
-            log.error("Exception when fetching car suggestions : {}", npe.getMessage());
-            throw new SuggestionNotFoundException("Car : " + key + " is not found");
-        }
-
+        SuggestionRepository suggestionRepository = cassandraRepository.getSuggestionRepository();
+        SuggestionDto suggestion = suggestionRepository.findByCarId(key);
+        return suggestion;
     }
 
     private FullCarInfo fetchCarInfo(String carId){

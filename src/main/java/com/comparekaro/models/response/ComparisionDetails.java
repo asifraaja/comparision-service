@@ -17,10 +17,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"errors", "metadata", "carsCompared", "images", "colors", "basicCarInfo", "minPriceOverview", "maxPriceOverview"
+        , "similarity", "difference"})
 @Getter
 public class ComparisionDetails {
     @JsonProperty("errors")
     List<RespError> errors;
+    @JsonProperty("carsCompared")
+    List<String> cars;
     @JsonProperty("images")
     List<Image> images;
     @JsonProperty("colors")

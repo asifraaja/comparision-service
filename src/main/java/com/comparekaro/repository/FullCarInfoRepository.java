@@ -20,11 +20,6 @@ public class FullCarInfoRepository {
     @Autowired private CarInfoMToFullCarInfoMapper carInfoMToFullCarInfoMapper;
 
     public FullCarInfo findByCarId(String carId) {
-//        Optional<Car> carOpt = carRepository.findById(carId);
-//        Car car = carOpt.get();
-//        FeatureDto feature = featureRepository.findByCarId(car.getId());
-//        SpecificationDto specification = specificationRepository.findByCarId(car.getId());
-//        return carToFullCarInfoMapper.map(car, feature, specification);
         Optional<CarInfoMDto> carOpt = carRepositoryM.findByCarId(carId);
         CarInfoMDto car = carOpt.get();
         return carInfoMToFullCarInfoMapper.map(car);

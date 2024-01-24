@@ -19,7 +19,7 @@ public class RequestValidator {
         if(carId == null || carId.isEmpty())
             throw new ValidationException("carId cannot be null or empty");
         if(pageNum == null || pageNum.trim().isEmpty()) {pageNum = DEFAULT_PAGE_NUM;}
-        if(pageSize == null || pageSize.trim().isEmpty()) {pageNum = DEFAULT_PAGE_SIZE;}
+        if(pageSize == null || pageSize.trim().isEmpty()) {pageSize = DEFAULT_PAGE_SIZE;}
         int page = checkForValidPageNum(pageNum);
         int size = checkForValidPageSize(pageSize);
 
@@ -33,7 +33,7 @@ public class RequestValidator {
     private int checkForValidPageSize(String pageSize) {
         try{
             int page = Integer.parseInt(pageSize);
-            if(page < 0 || page > 100) throw new ValidationException("pageNum should be between 1 and 100 (inclusive).");
+            if(page < 1 || page > 100) throw new ValidationException("pageNum should be between 1 and 100 (inclusive).");
             return page;
         }catch (Exception e){
             throw new ValidationException("pageSize should be between 1 and 100 (inclusive).");
@@ -43,7 +43,7 @@ public class RequestValidator {
     private int checkForValidPageNum(String pageNum) {
         try{
             int page = Integer.parseInt(pageNum);
-            if(page < 0 || page > 100) throw new ValidationException("pageNum should be between 1 and 100 (inclusive).");
+            if(page < 1 || page > 100) throw new ValidationException("pageNum should be between 1 and 100 (inclusive).");
             return page;
         }catch (Exception e){
             throw new ValidationException("pageNum should be between 1 and 100 (inclusive).");

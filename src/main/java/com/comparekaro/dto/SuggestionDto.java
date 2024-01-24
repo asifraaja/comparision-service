@@ -4,10 +4,12 @@ import com.comparekaro.dto.udt.ItemUDT;
 import com.datastax.oss.driver.api.mapper.annotations.ClusteringColumn;
 import com.datastax.oss.driver.api.mapper.annotations.CqlName;
 import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
+import lombok.Builder;
 import lombok.Data;
 
 import com.datastax.oss.driver.api.mapper.annotations.Entity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.List;
 @Data
 @Entity(defaultKeyspace = "compare_karo")
 @CqlName("suggestions")
+@NoArgsConstructor
 public class SuggestionDto {
     @PartitionKey
     @CqlName("id")

@@ -13,6 +13,11 @@
           "name": "Acceleration",
           "description": "Time taken to reach (0-100 kmph)",
           "sortOrder": 2
+        },
+        {
+          "name": "Fuel Type",
+          "description": "Type of fuel the car uses",
+          "sortOrder": 3
         }
       ]
     },
@@ -50,6 +55,11 @@
           "name": "Mileage",
           "description": "Mileage of the car",
           "sortOrder": 3
+        },
+        {
+          "name": "Range",
+          "description": "Number of km car can travel when the tank is full or battery is fully charged",
+          "sortOrder": 4
         }
       ]
     }

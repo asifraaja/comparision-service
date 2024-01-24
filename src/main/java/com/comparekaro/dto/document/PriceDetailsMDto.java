@@ -6,5 +6,5 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Data
 public class PriceDetailsMDto {
     @Field("price") private String price;
-    @Field("PriceDetailsMDto") private String formattedPrice;
+    @Field("formatted_price") private String formattedPrice;
 }

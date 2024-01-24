@@ -1,10 +1,12 @@
 package com.comparekaro.service;
 
+import com.comparekaro.errors.CarNotFoundException;
 import com.comparekaro.errors.CarsNotFoundException;
 import com.comparekaro.executor.CarExecutorThreadPool;
 import com.comparekaro.helper.ComparisonDetailsResponseCreator;
 import com.comparekaro.models.request.CompareCarRequest;
 import com.comparekaro.models.response.ComparisionDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,15 +21,16 @@ import java.util.stream.Collectors;
 import com.comparekaro.models.domain.FullCarInfo;
 
 @Service
+@Slf4j
 public class ComparisonService {
     @Autowired private CacheService cacheService;
-    @Autowired private CarExecutorThreadPool carExecutorThreadPool;
+//    @Autowired private CarExecutorThreadPool carExecutorThreadPool;
 
     @Autowired private ComparisonDetailsResponseCreator comparisionDetailsGenerator;
 
     public ComparisionDetails compareCars(CompareCarRequest request){
-        List<String> cars = request.getCars();
-        cars = cars.stream().filter(Objects::nonNull)
+        List<String> requestCars = request.getCars();
+        List<String> cars = requestCars.stream().filter(Objects::nonNull)
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -37,7 +40,12 @@ public class ComparisonService {
 //            CompletableFuture<FullCarInfo> cf
 //                    = carExecutorThreadPool.supplyAsync(() -> cacheService.getCarInfo(car));
 //            futures.add(cf);
-            FullCarInfo carInfo = cacheService.getCarInfo(car);
+            FullCarInfo carInfo = null;
+            try{
+                carInfo=cacheService.getCarInfo(car);
+            }catch (CarNotFoundException e){
+                log.info("One of the car not found : " + car);
+            }
             if(carInfo != null && carInfo.getCarId() != null && !carInfo.getCarId().isEmpty())
                 carMap.put(carInfo.getCarId(), carInfo);
         }
@@ -49,6 +57,10 @@ public class ComparisonService {
 //                .collect(Collectors.toMap(FullCarInfo::getId, Function.identity(), (f, s) -> f));
         if(carMap.isEmpty()){
             throw new CarsNotFoundException("Unable to compare car as car info not found");
+        }
+        List<String> actualCarList = new ArrayList<>(cars);
+        for(String car : actualCarList){
+            if(!carMap.containsKey(car)) cars.remove(car);
         }
         return comparisionDetailsGenerator.generator(carMap, cars, request);
 

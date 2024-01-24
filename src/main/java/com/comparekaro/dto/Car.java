@@ -1,16 +1,11 @@
 package com.comparekaro.dto;
 
-import com.comparekaro.helper.ListToStringConverter;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.C;
-import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.Column;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.List;
 
 //@TypeDef(
 //        name = "string-array",

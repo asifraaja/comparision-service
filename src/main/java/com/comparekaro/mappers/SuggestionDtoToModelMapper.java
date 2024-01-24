@@ -15,6 +15,7 @@ public class SuggestionDtoToModelMapper {
     public static final ArrayList<SuggestionModel> EMPTY_SUGGESSTION = new ArrayList<>();
 
     public SuggestionModel map(SuggestionDto dto){
+        if(dto == null) return SuggestionModel.builder().build();
         return SuggestionModel.builder()
                 .id(dto.getId())
                 .modelName(dto.getModelName())

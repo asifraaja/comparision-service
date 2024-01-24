@@ -15,9 +15,15 @@ import java.util.List;
 
 @Service
 public class SuggestionService {
-    @Autowired
     private CacheService cacheService;
-    @Autowired private SuggestionDtoToModelMapper suggestionDtoToModelMapper;
+    private SuggestionDtoToModelMapper suggestionDtoToModelMapper;
+
+    @Autowired
+    public SuggestionService(CacheService cacheService,
+                             SuggestionDtoToModelMapper suggestionDtoToModelMapper) {
+        this.cacheService = cacheService;
+        this.suggestionDtoToModelMapper = suggestionDtoToModelMapper;
+    }
 
     public SuggestionModel suggest(SuggestCarRequest request){
         SuggestionDto suggestDto = cacheService.getSuggestions(request.getCarId());
@@ -33,22 +39,29 @@ public class SuggestionService {
                             int pageNum,
                             int pageSize){
         List<SuggestionModel> similarCars = model.getSimilarCars();
-        int end = pageNum * pageSize, st = end - pageSize;
-        int size = similarCars.size();
-        List<SuggestionModel> paginatedCars;
-        try{
-            end = Math.min(end, size);
-            paginatedCars = similarCars.subList(st, end);
-        }catch (Exception e){
-            st = 0;
-            end = Math.min(size, pageSize);
-            paginatedCars = similarCars.subList(0, Math.min(size, pageSize));
-        }
+        if(similarCars != null) {
+            int end = pageNum * pageSize, st = end - pageSize;
+            int size = similarCars.size();
+            List<SuggestionModel> paginatedCars;
+            try {
+                end = Math.min(end, size);
+                paginatedCars = similarCars.subList(st, end);
+            } catch (Exception e) {
+                st = 0;
+                end = Math.min(size, pageSize);
+                paginatedCars = similarCars.subList(0, Math.min(size, pageSize));
+            }
 
-        model.setSimilarCars(Collections.unmodifiableList(paginatedCars));
-        model.setTotalCars(size);
-        model.setPageNum(pageNum);
-        model.setStartIndex(st);
-        model.setEndIndex(end);
+            model.setSimilarCars(Collections.unmodifiableList(paginatedCars));
+            model.setTotalCars(size);
+            model.setPageNum(pageNum);
+            model.setStartIndex(st);
+            model.setEndIndex(end);
+        }else {
+            model.setTotalCars(0);
+            model.setPageNum(pageNum);
+            model.setStartIndex(0);
+            model.setEndIndex(0);
+        }
     }
 }

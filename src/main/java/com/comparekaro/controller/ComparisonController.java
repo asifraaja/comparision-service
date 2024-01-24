@@ -41,45 +41,19 @@ public class ComparisonController {
     @RequestMapping(value = "/compare", method = RequestMethod.GET,produces = "application/json;charset=UTF-8")
     public ResponseEntity compareCars(@RequestParam(value = "cars") String cars,
                                       @RequestParam(value = "hideSimilar", required = false, defaultValue = "false") String hideSimilar){
-        ComparisionDetails response;
-        try {
             CompareCarRequest request = requestValidator.validateCompareCarsRequest(cars, hideSimilar);
-            response = comparisionService.compareCars(request);
-            return new ResponseEntity<ComparisionDetails>(response, HttpStatus.OK);
-//        }catch (CarsNotFoundException | CarNotFoundException e){
-//            List<RespError> errors
-//                    = List.of(new RespError("CAR INFO NOT FOUND", e.getMessage()));
-//            response = ComparisionDetails.builder().errors(errors).build();
-//            return new ResponseEntity<ComparisionDetails>(response, HttpStatus.BAD_REQUEST);
-        }catch (Exception e){
-            List<RespError> errors
-                    = List.of(new RespError("INTERNAL SERVER ERROR", e.getMessage()));
-            response = ComparisionDetails.builder().errors(errors).build();
-            return new ResponseEntity<ComparisionDetails>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            ComparisionDetails response = comparisionService.compareCars(request);
+            return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/suggest", method = RequestMethod.GET,produces = "application/json;charset=UTF-8")
     public ResponseEntity suggestCars(@RequestParam(value = "carId") String carId,
-                                      @RequestParam(value = "pageSize", required = false, defaultValue = "1") String pageSize,
-                                      @RequestParam(value = "pageNum", required = false, defaultValue = "10") String pageNum){
-        SuggestionResponse response;
-        try {
+                                      @RequestParam(value = "pageSize", required = false, defaultValue = "10") String pageSize,
+                                      @RequestParam(value = "pageNum", required = false, defaultValue = "1") String pageNum){
             SuggestCarRequest request = requestValidator.validateSuggestionRequest(carId, pageNum, pageSize);
             SuggestionModel similarCars = suggestionService.suggest(request);
-            response = suggestionResponseCreator.createResp(similarCars);
+            SuggestionResponse response = suggestionResponseCreator.createResp(similarCars);
             return new ResponseEntity<>(response, HttpStatus.OK);
-//        }catch (CarNotFoundException | SuggestionNotFoundException e){
-//            List<RespError> errors
-//                    = List.of(new RespError("CAR ID NOT FOUND", e.getMessage()));
-//            response = SuggestionResponse.builder().errors(errors).build();
-//            return new ResponseEntity<SuggestionResponse>(response, HttpStatus.BAD_REQUEST);
-        } catch (Exception e){
-            List<RespError> errors
-                    = List.of(new RespError("INTERNAL SERVER ERROR", e.getMessage()));
-            response = SuggestionResponse.builder().errors(errors).build();
-            return new ResponseEntity<SuggestionResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
 
     }
 }
